@@ -34,7 +34,7 @@ import java.io.FileInputStream;
 import java.nio.channels.FileChannel;
 import java.nio.MappedByteBuffer;
 import android.graphics.Bitmap;
-
+import android.os.Environment;
 import org.tensorflow.lite.Interpreter;
 
 import java.io.File;
@@ -467,12 +467,10 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
   }
 
   private MappedByteBuffer loadModelFile() throws IOException {
-    AssetFileDescriptor fileDescriptor = mThemedReactContext.getAssets().openFd(mModelFile);
-    FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-    FileChannel fileChannel = inputStream.getChannel();
-    long startOffset = fileDescriptor.getStartOffset();
-    long declaredLength = fileDescriptor.getDeclaredLength();
-    return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+    FileInputStream inputStreamCustom = new FileInputStream(Environment.getExternalStorageDirectory()+mModelFile);
+    FileChannel fileChannelCustom = inputStreamCustom.getChannel();
+    MappedByteBuffer buffer = fileChannelCustom.map(FileChannel.MapMode.READ_ONLY, 0, fileChannelCustom.size());
+    return buffer;
   }
 
   private void setupModelProcessor() {
